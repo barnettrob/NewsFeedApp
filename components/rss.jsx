@@ -1,17 +1,14 @@
 import React, { Component } from "react";
 import {
   StyleSheet,
-  Text,
-  View,
   TouchableHighlight,
-  Image,
-  SafeAreaView,
-  Button,
-  Alert,
-  Platform,
-  SectionList,
+  FlatList,
+  Linking
 } from "react-native";
 import { parse } from "fast-xml-parser";
+// https://github.com/Paraboly/react-native-card
+// Make sure to install the dependencies listed as well as npm install --save tslib
+import { Card } from "@paraboly/react-native-card";
 
 class News extends Component {
   constructor(props) {
@@ -54,119 +51,114 @@ class News extends Component {
   }
 
   fetchFeed() {
-    const test = fetch("https://www.theguardian.com/us/rss")
-    .then(result => result.text())
-    .then(data => {
-      const feedData = parse(data);
-      return feedData.rss.channel["item"]
-      //return parse(data);
-    }).then(function(d) {
-      return d;
-    })
-  
-    return test;
-  }
-
-  newsRssFeed() {
-    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
     const rssUrls = {
-      // "Common Dreams": "https://www.commondreams.org/rss.xml",
       "The Guardian": "https://www.theguardian.com/us/rss",
       "National Review": "https://www.nationalreview.com/feed/",
       "Axios": "https://api.axios.com/feed/",
     };
-
-    let today = new Date();
-    const day = today.getDate();
-    const year = today.getFullYear();
-    const todayFormatted = `${this.todayDayShort(today)}, ${day} ${this.todayMonthShort(
-      today
-    )} ${year}`;
-    const newsFeed = [];
-
     for (let newspaper in rssUrls) {
-      fetch(rssUrls[newspaper])
-        .then((response) => response.text())
-        .then((response) => {
-          let data = parse(response);
-          let items = data.rss.channel["item"];
+      //console.log(rssUrls);
+      // const url = fetch(rssUrls[newspaper])
+      // .then(result => result.text())
+      // .then(data => {
+      //   const feedData = parse(data);
+      //   return feedData.rss.channel["item"]
+      //   //return parse(data);
+      // }).then(function(d) {
+      //   return d;
+      // })
 
-          items.forEach((el, key) => {
-            const pubDateArray = el.pubDate.split(" ");
-            if (
-              `${pubDateArray[0]} ${pubDateArray[1]} ${pubDateArray[2]} ${pubDateArray[3]}` ===
-              todayFormatted
-            ) {
-              newsFeed.push({
-                'paper': newspaper,
-                'pubDate': el.pubDate,
-                'link': el.link,
-                'title': el.title
-              });
-            }
-          });
-          //console.log(this.state);
-          //return newsFeed;
-          // return newsFeed.map(function(news, i) {
-          //   return (
-          //     <View key={i}>
-          //       <Text>{news}</Text>
-          //     </View>
-          //   )
-          // })
-        })
-        .catch((err) => {
-          console.log("fetch", err);
-        });
+      // return url;
     }
+    const url = fetch("https://www.theguardian.com/us/rss")
+    .then(result => result.text())
+    .then(data => {
+      const feedData = parse(data);
+      return feedData.rss.channel["item"]
+    }).then(function(d) {
+      return d;
+    })
+  //console.log(url);
+    return url;
+  }
 
+  formatDate(date) {
+    var d = new Date(date);
+    var hh = d.getHours();
+    var m = d.getMinutes();
+    var s = d.getSeconds();
+    var dd = "AM";
+    var h = hh;
+    if (h >= 12) {
+      h = hh - 12;
+      dd = "PM";
+    }
+    if (h == 0) {
+      h = 12;
+    }
+    m = m < 10 ? "0" + m : m;
+  
+    s = s < 10 ? "0" + s : s;
+  
+    /* if you want 2 digit hours:
+    h = h<10?"0"+h:h; */
+  
+    var pattern = new RegExp("0?" + hh + ":" + m + ":" + s);
+  
+    var replacement = h + ":" + m;
+    /* if you want to add seconds
+    replacement += ":"+s;  */
+    replacement += " " + dd;
+  
+    return date.replace(pattern, replacement);
   }
 
   render() {
-    //console.log(this.fetchFeed()); // Just shows Promise.
     const feed = this.state.news;
-    //console.log(feed);
 
-    let today = new Date();
-    const day = today.getDate();
-    const year = today.getFullYear();
-    const todayFormatted = `${this.todayDayShort(today)}, ${day} ${this.todayMonthShort(
-      today
-    )} ${year}`;
-
-    let newsItems = [];
-    feed.forEach((el, key) => {
-      const pubDateArray = el.pubDate.split(" ");
-      if (
-        `${pubDateArray[0]} ${pubDateArray[1]} ${pubDateArray[2]} ${pubDateArray[3]}` ===
-        todayFormatted
-      ) {
-        newsItems.push({
-          // 'paper': newspaper,
-          'pubDate': el.pubDate,
-          'link': el.link,
-          'title': el.title
-        });
-      }
-    });
-    console.log(newsItems)
-
-    return newsItems.map(function(item, i) {
-      return (
-        <View key={i}>
-          <Text>-----------</Text>
-          <Text>{item.pubDate}</Text>
-          <Text>{item.link}</Text>
-          <Text>{item.title}</Text>
-        </View>
-      )
-    })
-    // return (
-    //   <SafeAreaView>
-    //     {this.newsRssFeed()}
-    //   </SafeAreaView>
-    // );
+    return (
+      <FlatList
+        data={feed}
+        numColumns={1}
+        keyExtractor={(item, index) => index.toString() }
+        renderItem={({item}) => {
+          let today = new Date();
+          const day = today.getDate();
+          const year = today.getFullYear();
+          const todayFormatted = `${this.todayDayShort(today)}, ${day} ${this.todayMonthShort(
+            today
+          )} ${year}`;
+          const pubDateArray = item.pubDate.split(" ");
+          const date = new Date(item.pubDate);
+          const localDate = this.formatDate(date.toString());
+          if (
+            `${pubDateArray[0]} ${pubDateArray[1]} ${pubDateArray[2]} ${pubDateArray[3]}` ===
+            todayFormatted
+          ) {
+            return (
+                <Card style={styles.card}
+                  iconDisable
+                  title={item.title}
+                  content={localDate.replace(' GMT-0400 (EDT)', '')}
+                  topRightText="Open"
+                  onPress={() => {Linking.openURL(item.link)}}
+                />
+            )
+          }
+      }} 
+      />
+    )
   }
 }
+
+const styles = StyleSheet.create({
+  card: {
+    borderRadius: 5,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    backgroundColor: "#fff",
+    margin: 15
+  }
+});
 
 export default News;

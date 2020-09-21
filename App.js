@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
 import {
   StyleSheet,
@@ -12,6 +11,8 @@ import {
   Platform,
   SectionList,
   FlatList,
+  ScrollView,
+  StatusBar
 } from "react-native";
 
 import News from "./components/rss";
@@ -111,12 +112,11 @@ export default class App extends React.Component {
     //console.log(this.fetchTest());
     //console.log(this.state.articles);
     return (
-      <View style={styles.container}>
-        {
-          this.WholeNews()
-        }
-        <News />
-      </View>
+      <SafeAreaView style={styles.container}>
+        {/* <ScrollView style={styles.scrollView}> */}
+          <News />
+        {/* </ScrollView> */}
+      </SafeAreaView>
     );
   }
 }
@@ -124,9 +124,8 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: "#efefef",
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 5 : 5,
   },
   button: {
     marginTop: Platform.OS === "android" ? 20 : 10,
