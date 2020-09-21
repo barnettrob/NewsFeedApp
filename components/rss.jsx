@@ -3,7 +3,7 @@ import {
   StyleSheet,
   TouchableHighlight,
   FlatList,
-  Linking
+  Linking,
 } from "react-native";
 import { parse } from "fast-xml-parser";
 // https://github.com/Paraboly/react-native-card
@@ -13,16 +13,24 @@ import { Card } from "@paraboly/react-native-card";
 class News extends Component {
   constructor(props) {
     super(props);
-    this.state = {news: [] };
+    this.state = { news: [] };
   }
 
   componentDidMount() {
-    this.fetchFeed()
-    .then((data) => {
-      this.setState({
-        news: data,
-      })
-    });
+    const rssUrls = {
+      "The Guardian": "https://www.theguardian.com/us/rss",
+      "National Review": "https://www.nationalreview.com/feed/",
+      "Axios": "https://api.axios.com/feed/",
+    };
+
+    for (let newspaper in rssUrls) {
+      this.fetchFeed(rssUrls[newspaper]).then((data) => {
+        this.setState({
+          news: data,
+          newssource: newspaper,
+        });
+      });
+    }
   }
 
   todayDayShort(date) {
@@ -50,35 +58,17 @@ class News extends Component {
     return Date.shortMonths[date.getMonth()];
   }
 
-  fetchFeed() {
-    const rssUrls = {
-      "The Guardian": "https://www.theguardian.com/us/rss",
-      "National Review": "https://www.nationalreview.com/feed/",
-      "Axios": "https://api.axios.com/feed/",
-    };
-    for (let newspaper in rssUrls) {
-      //console.log(rssUrls);
-      // const url = fetch(rssUrls[newspaper])
-      // .then(result => result.text())
-      // .then(data => {
-      //   const feedData = parse(data);
-      //   return feedData.rss.channel["item"]
-      //   //return parse(data);
-      // }).then(function(d) {
-      //   return d;
-      // })
+  fetchFeed(rss) {
+    const url = fetch(rss)
+      .then((result) => result.text())
+      .then((data) => {
+        const feedData = parse(data);
+        return feedData.rss.channel["item"];
+      })
+      .then(function (d) {
+        return d;
+      });
 
-      // return url;
-    }
-    const url = fetch("https://www.theguardian.com/us/rss")
-    .then(result => result.text())
-    .then(data => {
-      const feedData = parse(data);
-      return feedData.rss.channel["item"]
-    }).then(function(d) {
-      return d;
-    })
-  //console.log(url);
     return url;
   }
 
@@ -97,37 +87,37 @@ class News extends Component {
       h = 12;
     }
     m = m < 10 ? "0" + m : m;
-  
+
     s = s < 10 ? "0" + s : s;
-  
+
     /* if you want 2 digit hours:
     h = h<10?"0"+h:h; */
-  
+
     var pattern = new RegExp("0?" + hh + ":" + m + ":" + s);
-  
+
     var replacement = h + ":" + m;
     /* if you want to add seconds
     replacement += ":"+s;  */
     replacement += " " + dd;
-  
+
     return date.replace(pattern, replacement);
   }
 
   render() {
     const feed = this.state.news;
-
+    const newssource = this.state.newssource;
     return (
       <FlatList
         data={feed}
         numColumns={1}
-        keyExtractor={(item, index) => index.toString() }
-        renderItem={({item}) => {
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item, index }) => {
           let today = new Date();
           const day = today.getDate();
           const year = today.getFullYear();
-          const todayFormatted = `${this.todayDayShort(today)}, ${day} ${this.todayMonthShort(
+          const todayFormatted = `${this.todayDayShort(
             today
-          )} ${year}`;
+          )}, ${day} ${this.todayMonthShort(today)} ${year}`;
           const pubDateArray = item.pubDate.split(" ");
           const date = new Date(item.pubDate);
           const localDate = this.formatDate(date.toString());
@@ -136,18 +126,21 @@ class News extends Component {
             todayFormatted
           ) {
             return (
-                <Card style={styles.card}
-                  iconDisable
-                  title={item.title}
-                  content={localDate.replace(' GMT-0400 (EDT)', '')}
-                  topRightText="Open"
-                  onPress={() => {Linking.openURL(item.link)}}
-                />
-            )
+              <Card
+                style={styles.card}
+                iconDisable
+                title={item.title}
+                content={localDate.replace(" GMT-0400 (EDT)", "")}
+                topRightText={newssource}
+                onPress={() => {
+                  Linking.openURL(item.link);
+                }}
+              />
+            );
           }
-      }} 
+        }}
       />
-    )
+    );
   }
 }
 
@@ -157,8 +150,8 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderWidth: 1,
     backgroundColor: "#fff",
-    margin: 15
-  }
+    margin: 15,
+  },
 });
 
 export default News;
