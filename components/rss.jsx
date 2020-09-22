@@ -118,9 +118,9 @@ class News extends Component {
 
   render() {
     //console.log(this.fetchFeed()); // Just shows Promise.
-    const feed1 = this.state.news1.slice(0, 3);
-    const feed2 = this.state.news2.slice(0, 3);
-    const feed3 = this.state.news3.slice(0, 3);
+    const feed1 = this.state.news1.slice(0, 10);
+    const feed2 = this.state.news2.slice(0, 10);
+    const feed3 = this.state.news3.slice(0, 10);
     const feedsCombined = [];
     feedsCombined.push(...feed1, ...feed2, ...feed3);
 
@@ -152,7 +152,7 @@ class News extends Component {
       }
     });
 
-    return newsItems.slice(0, 10).map(function(item, i) {
+    return newsItems.map(function(item, i) {
       let url = item.link;
       url = url.replace("https://", "");
       url = url.split("/");
