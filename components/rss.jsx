@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 import {
   StyleSheet,
-  TouchableHighlight,
+  TouchableOpacity,
   FlatList,
   Linking,
+  View,
+  Text
 } from "react-native";
 import { parse } from "fast-xml-parser";
 // https://github.com/Paraboly/react-native-card
@@ -13,7 +15,7 @@ import { Card } from "@paraboly/react-native-card";
 class News extends Component {
   constructor(props) {
     super(props);
-    this.state = { news: [] };
+    this.state = { news1: [], news2: [], news3: [] };
   }
 
   componentDidMount() {
@@ -25,10 +27,21 @@ class News extends Component {
 
     for (let newspaper in rssUrls) {
       this.fetchFeed(rssUrls[newspaper]).then((data) => {
-        this.setState({
-          news: data,
-          newssource: newspaper,
-        });
+        if (rssUrls[Object.keys(rssUrls)[0]] == rssUrls[newspaper]) {
+          this.setState({
+            news1: data,
+          });
+        }
+        else if(rssUrls[Object.keys(rssUrls)[1]] == rssUrls[newspaper]) {
+          this.setState({
+            news2: data,
+          });
+        }
+        else if (rssUrls[Object.keys(rssUrls)[2]] == rssUrls[newspaper]) {
+          this.setState({
+            news3: data,
+          });
+        }
       });
     }
   }
@@ -104,43 +117,59 @@ class News extends Component {
   }
 
   render() {
-    const feed = this.state.news;
-    const newssource = this.state.newssource;
-    return (
-      <FlatList
-        data={feed}
-        numColumns={1}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => {
-          let today = new Date();
-          const day = today.getDate();
-          const year = today.getFullYear();
-          const todayFormatted = `${this.todayDayShort(
-            today
-          )}, ${day} ${this.todayMonthShort(today)} ${year}`;
-          const pubDateArray = item.pubDate.split(" ");
-          const date = new Date(item.pubDate);
-          const localDate = this.formatDate(date.toString());
-          if (
-            `${pubDateArray[0]} ${pubDateArray[1]} ${pubDateArray[2]} ${pubDateArray[3]}` ===
-            todayFormatted
-          ) {
-            return (
-              <Card
-                style={styles.card}
-                iconDisable
-                title={item.title}
-                content={localDate.replace(" GMT-0400 (EDT)", "")}
-                topRightText={newssource}
-                onPress={() => {
-                  Linking.openURL(item.link);
-                }}
-              />
-            );
-          }
-        }}
-      />
-    );
+    //console.log(this.fetchFeed()); // Just shows Promise.
+    const feed1 = this.state.news1.slice(0, 3);
+    const feed2 = this.state.news2.slice(0, 3);
+    const feed3 = this.state.news3.slice(0, 3);
+    const feedsCombined = [];
+    feedsCombined.push(...feed1, ...feed2, ...feed3);
+
+    let today = new Date();
+    const day = today.getDate();
+    const year = today.getFullYear();
+    const todayFormatted = `${this.todayDayShort(today)}, ${day} ${this.todayMonthShort(
+      today
+    )} ${year}`;
+
+    let newsItems = [];
+    feedsCombined.forEach((el, key) => {
+      const pubDateArray = el.pubDate.split(" ");
+
+      if (
+        `${pubDateArray[0]} ${pubDateArray[1]} ${pubDateArray[2]} ${pubDateArray[3]}` ===
+        todayFormatted
+      ) {
+        const date = new Date(el.pubDate);
+        const localDate = this.formatDate(date.toString());
+
+        
+
+        newsItems.push({
+          'pubDate': localDate.replace(" GMT-0400 (EDT)", ""),
+          'link': el.link,
+          'title': el.title
+        });
+      }
+    });
+
+    return newsItems.slice(0, 10).map(function(item, i) {
+      let url = item.link;
+      url = url.replace("https://", "");
+      url = url.split("/");
+      const domain = url[0];
+
+      return (
+        <TouchableOpacity activeOpacity={0.6} onPress={() => {
+          Linking.openURL(item.link);
+        }} key={i}>
+          <View key={i} style={styles.card}>
+            <Text>{domain}</Text>
+            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.date}>{item.pubDate}</Text>
+          </View>
+        </TouchableOpacity>
+      )
+    })
   }
 }
 
@@ -151,7 +180,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: "#fff",
     margin: 15,
+    padding: 20
   },
+  title: {
+    fontSize: 16
+  },
+  date: {
+    color: '#7f7f7f'
+  }
 });
 
 export default News;

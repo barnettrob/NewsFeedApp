@@ -16,6 +16,7 @@ import {
 } from "react-native";
 
 import News from "./components/rss";
+import NewsTwo from "./components/rsstwo";
 
 export default class App extends React.Component {
   constructor(props) {
@@ -113,9 +114,9 @@ export default class App extends React.Component {
     //console.log(this.state.articles);
     return (
       <SafeAreaView style={styles.container}>
-        {/* <ScrollView style={styles.scrollView}> */}
-          <News />
-        {/* </ScrollView> */}
+          <ScrollView>
+            <News />
+          </ScrollView>
       </SafeAreaView>
     );
   }
