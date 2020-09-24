@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { StyleSheet, Linking, View, Text, Button } from "react-native";
+import Settings from "./settings";
 
 class Header extends Component {
   render() {
@@ -9,16 +10,7 @@ class Header extends Component {
           <Text style={styles.title}>News</Text>
         </View>
         <View style={styles.containerRight}>
-          <Button
-            style={styles.navConfig}
-            color="#0b7c66"
-            onPress={() => {
-              Linking.openSettings();
-            }}
-            title="Config"
-          >
-            Config
-          </Button>
+          <Settings />
         </View>
       </View>
     );
