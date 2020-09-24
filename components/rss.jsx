@@ -2,15 +2,11 @@ import React, { Component } from "react";
 import {
   StyleSheet,
   TouchableOpacity,
-  FlatList,
   Linking,
   View,
   Text
 } from "react-native";
 import { parse } from "fast-xml-parser";
-// https://github.com/Paraboly/react-native-card
-// Make sure to install the dependencies listed as well as npm install --save tslib
-import { Card } from "@paraboly/react-native-card";
 
 class News extends Component {
   constructor(props) {
@@ -117,7 +113,6 @@ class News extends Component {
   }
 
   render() {
-    //console.log(this.fetchFeed()); // Just shows Promise.
     const feed1 = this.state.news1.slice(0, 10);
     const feed2 = this.state.news2.slice(0, 10);
     const feed3 = this.state.news3.slice(0, 10);
