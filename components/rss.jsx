@@ -7,6 +7,7 @@ import {
   Text
 } from "react-native";
 import { parse } from "fast-xml-parser";
+import AsyncStorage from '@react-native-community/async-storage';
 
 class News extends Component {
   constructor(props) {
@@ -158,7 +159,7 @@ class News extends Component {
           Linking.openURL(item.link);
         }} key={i}>
           <View key={i} style={styles.card}>
-            <Text>{domain}</Text>
+            <Text style={styles.eyebrow}>{domain}</Text>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.date}>{item.pubDate}</Text>
           </View>
@@ -177,11 +178,20 @@ const styles = StyleSheet.create({
     margin: 15,
     padding: 20
   },
+  eyebrow: {
+    marginBottom: 2,
+    fontSize: 15,
+    //backgroundColor: "#ef6969",
+    borderRadius: 3,
+    padding: 3,
+    //color: '#fff'
+  },
   title: {
-    fontSize: 16
+    fontSize: 18
   },
   date: {
-    color: '#7f7f7f'
+    color: '#7f7f7f',
+    marginTop: 5,
   }
 });
 

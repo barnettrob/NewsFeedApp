@@ -9,7 +9,13 @@ expo start
 ```
 After this, a brower window will load a Metro Bundler page at localhost:19002<br/>
 Here, or in the terminal after expo start, you can interact with the phone simulators or your real phone.<br/>
-See the section below for loading your app on your real phone.
+See the section below for loading your app on your real phone.<br/>
+
+For settings storage, you'll need to install the Async Storage library.<br/>
+https://docs.expo.io/versions/latest/sdk/async-storage/
+```bash
+expo install @react-native-community/async-storage
+```
 
 ## Emulator setup
 ### iPhone
