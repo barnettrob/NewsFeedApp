@@ -3,10 +3,15 @@ import { StyleSheet, View, Text, Button, TextInput } from "react-native";
 import AsyncStorage from '@react-native-community/async-storage';
 
 class SettingsForm extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      rssFeeds: {}
+    }
+  }
 
   render() {
     let rssInputArray = [];
-    let inputValues = {};
     for (let i = 0; i < 5; i++) {
       rssInputArray.push(<TextInput
         key={i}
@@ -15,13 +20,12 @@ class SettingsForm extends Component {
         ref={i}
         onEndEditing={(e) => {
           if (i < 4 && e.nativeEvent.text !== '' && e.nativeEvent !== 'undefined') {
-            inputValues['rss' + i] = e.nativeEvent.text
-            //console.log(inputValues);
+            this.state.rssFeeds['rss' + i] = e.nativeEvent.text
           }
         }}
-        onChangeText={(e) => {
+        onChangeText={(text) => {
           if (i === 4) {
-
+            this.state.rssFeeds['rss' + i] = text;
           }
         }}
       />);
@@ -31,6 +35,12 @@ class SettingsForm extends Component {
       <View>
         {rssInputArray}
         {/* Take a look at https://react-hook-form.com/ */}
+        <Button
+          title="Save"
+          onPress={() =>{
+            console.log(this.state);
+          }}
+        />
       </View>
     );
   }
