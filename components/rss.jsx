@@ -4,44 +4,66 @@ import {
   TouchableOpacity,
   Linking,
   View,
-  Text
+  Text,
 } from "react-native";
 import { parse } from "fast-xml-parser";
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from "@react-native-community/async-storage";
 
 class News extends Component {
   constructor(props) {
     super(props);
-    this.state = { news1: [], news2: [], news3: [] };
+    this.state = {
+      news1: [],
+      news2: [],
+      news3: [],
+      news4: [],
+      news5: [],
+      savedFeeds: {},
+    };
   }
 
   componentDidMount() {
-    const rssUrls = {
-      "The Guardian": "https://www.theguardian.com/us/rss",
-      "National Review": "https://www.nationalreview.com/feed/",
-      "Axios": "https://api.axios.com/feed/",
-    };
-
-    for (let newspaper in rssUrls) {
-      this.fetchFeed(rssUrls[newspaper]).then((data) => {
-        if (rssUrls[Object.keys(rssUrls)[0]] == rssUrls[newspaper]) {
-          this.setState({
-            news1: data,
+    const feeds = this.getFeedData().then((result) => {
+      if (result !== null) {
+        this.setState({ savedFeeds: result });
+        const rssFeeds = this.state.savedFeeds;
+        for (let feed in rssFeeds) {
+          this.fetchFeed(rssFeeds[feed]).then((data) => {
+            if (rssFeeds[Object.keys(rssFeeds)[0]] == rssFeeds[feed]) {
+              this.setState({
+                news1: data,
+              });
+            } else if (rssFeeds[Object.keys(rssFeeds)[1]] == rssFeeds[feed]) {
+              this.setState({
+                news2: data,
+              });
+            } else if (rssFeeds[Object.keys(rssFeeds)[2]] == rssFeeds[feed]) {
+              this.setState({
+                news3: data,
+              });
+            } else if (rssFeeds[Object.keys(rssFeeds)[3]] == rssFeeds[feed]) {
+              this.setState({
+                news4: data,
+              });
+            } else if (rssFeeds[Object.keys(rssFeeds)[4]] == rssFeeds[feed]) {
+              this.setState({
+                news5: data,
+              });
+            }
           });
         }
-        else if(rssUrls[Object.keys(rssUrls)[1]] == rssUrls[newspaper]) {
-          this.setState({
-            news2: data,
-          });
-        }
-        else if (rssUrls[Object.keys(rssUrls)[2]] == rssUrls[newspaper]) {
-          this.setState({
-            news3: data,
-          });
-        }
-      });
-    }
+      }
+    });
   }
+
+  getFeedData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("rssFeeds");
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      // error reading value
+    }
+  };
 
   todayDayShort(date) {
     Date.shortDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -123,9 +145,9 @@ class News extends Component {
     let today = new Date();
     const day = today.getDate();
     const year = today.getFullYear();
-    const todayFormatted = `${this.todayDayShort(today)}, ${day} ${this.todayMonthShort(
+    const todayFormatted = `${this.todayDayShort(
       today
-    )} ${year}`;
+    )}, ${day} ${this.todayMonthShort(today)} ${year}`;
 
     let newsItems = [];
     feedsCombined.forEach((el, key) => {
@@ -138,34 +160,36 @@ class News extends Component {
         const date = new Date(el.pubDate);
         const localDate = this.formatDate(date.toString());
 
-        
-
         newsItems.push({
-          'pubDate': localDate.replace(" GMT-0400 (EDT)", ""),
-          'link': el.link,
-          'title': el.title
+          pubDate: localDate.replace(" GMT-0400 (EDT)", ""),
+          link: el.link,
+          title: el.title,
         });
       }
     });
 
-    return newsItems.map(function(item, i) {
+    return newsItems.map(function (item, i) {
       let url = item.link;
       url = url.replace("https://", "");
       url = url.split("/");
       const domain = url[0];
 
       return (
-        <TouchableOpacity activeOpacity={0.6} onPress={() => {
-          Linking.openURL(item.link);
-        }} key={i}>
+        <TouchableOpacity
+          activeOpacity={0.6}
+          onPress={() => {
+            Linking.openURL(item.link);
+          }}
+          key={i}
+        >
           <View key={i} style={styles.card}>
             <Text style={styles.eyebrow}>{domain}</Text>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.date}>{item.pubDate}</Text>
           </View>
         </TouchableOpacity>
-      )
-    })
+      );
+    });
   }
 }
 
@@ -176,7 +200,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: "#fff",
     margin: 15,
-    padding: 20
+    padding: 20,
   },
   eyebrow: {
     marginBottom: 2,
@@ -187,12 +211,12 @@ const styles = StyleSheet.create({
     //color: '#fff'
   },
   title: {
-    fontSize: 18
+    fontSize: 18,
   },
   date: {
-    color: '#7f7f7f',
+    color: "#7f7f7f",
     marginTop: 5,
-  }
+  },
 });
 
 export default News;
