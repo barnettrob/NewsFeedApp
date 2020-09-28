@@ -36,6 +36,7 @@ class SettingsForm extends Component {
     try {
       const jsonValue = JSON.stringify(rssFeeds);
       await AsyncStorage.setItem("rssFeeds", jsonValue);
+      alert("Feeds Saved!")
     } catch (e) {
       alert("There was a problem saving your RSS Feeds");
     }

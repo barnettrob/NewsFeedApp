@@ -139,8 +139,11 @@ class News extends Component {
     const feed1 = this.state.news1.slice(0, 10);
     const feed2 = this.state.news2.slice(0, 10);
     const feed3 = this.state.news3.slice(0, 10);
+    const feed4 = this.state.news4.slice(0, 10);
+    const feed5 = this.state.news5.slice(0, 10);
+
     const feedsCombined = [];
-    feedsCombined.push(...feed1, ...feed2, ...feed3);
+    feedsCombined.push(...feed1, ...feed2, ...feed3, ...feed4, ...feed5);
 
     let today = new Date();
     const day = today.getDate();
