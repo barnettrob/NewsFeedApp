@@ -28,6 +28,7 @@ class Settings extends Component {
                 style={{ ...styles.openButton, backgroundColor: "#0b7c66", margin: 10 }}
                 onPress={() => {
                   this.setModalVisible(!modalVisible);
+                  
                 }}
               >
                 <Text style={styles.textStyle}>Close</Text>

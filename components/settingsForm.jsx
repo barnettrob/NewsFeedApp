@@ -52,11 +52,12 @@ class SettingsForm extends Component {
   };
 
   render() {
+    this.state.rssFeeds = this.state.feedsStorage;
     let rssInputArray = [];
     for (let i = 0; i < 5; i++) {
       let key =
         typeof Object.keys(this.state.feedsStorage)[i] === "undefined"
-          ? 0
+          ? 'zero'
           : Object.keys(this.state.feedsStorage)[i];
       rssInputArray.push(
         <TextInput
@@ -66,26 +67,18 @@ class SettingsForm extends Component {
           ref={(input) => {
             this.i = input;
           }}
-          defaultValue={this.state.feedsStorage[key]}
+          defaultValue={key != 'zero' ? this.state.feedsStorage[key] : ''}
           onEndEditing={(e) => {
-            if (
-              i < 4 &&
-              e.nativeEvent.text !== "" &&
-              e.nativeEvent !== "undefined"
-            ) {
-              if (this.is_url(e.nativeEvent.text)) {
-                this.state.rssFeeds[i] = e.nativeEvent.text;
-              } else {
-                alert("Invalid url");
-                this.i.clear();
-              }
+            // Validate url.  If not valid then clear input field.
+            if (e.nativeEvent.text != '' && !this.is_url(e.nativeEvent.text)) {
+              alert("Invalid url");
+              this.i.clear();
             }
           }}
           onChangeText={(text) => {
-            if (i === 4) {
-              if (this.is_url(text)) {
-                this.state.rssFeeds[i] = text;
-              }
+            // Save the rss feed to state.
+            if (this.is_url(text)) {
+              this.state.rssFeeds[i] = text;
             }
           }}
         />

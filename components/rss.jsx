@@ -145,6 +145,13 @@ class News extends Component {
     const feedsCombined = [];
     feedsCombined.push(...feed1, ...feed2, ...feed3, ...feed4, ...feed5);
 
+    // Check if feeds array is empty and show message if it is.
+    if (feedsCombined === undefined || feedsCombined.length === 0) {
+      return (
+        <Text style={styles.empty}>Add rss feeds to Config or scroll up to refresh list.</Text>
+      )
+    }
+
     let today = new Date();
     const day = today.getDate();
     const year = today.getFullYear();
@@ -154,7 +161,7 @@ class News extends Component {
 
     let newsItems = [];
     feedsCombined.forEach((el, key) => {
-      const pubDateArray = el.pubDate.split(" ");
+      const pubDateArray = el.pubDate !== "undefined" ? el.pubDate.split(" ") : [];
 
       if (
         `${pubDateArray[0]} ${pubDateArray[1]} ${pubDateArray[2]} ${pubDateArray[3]}` ===
@@ -208,10 +215,8 @@ const styles = StyleSheet.create({
   eyebrow: {
     marginBottom: 2,
     fontSize: 15,
-    //backgroundColor: "#ef6969",
     borderRadius: 3,
     padding: 3,
-    //color: '#fff'
   },
   title: {
     fontSize: 18,
@@ -220,6 +225,12 @@ const styles = StyleSheet.create({
     color: "#7f7f7f",
     marginTop: 5,
   },
+  empty: {
+    marginTop: 20,
+    marginLeft: 5,
+    textAlign: "center",
+    fontSize: 16
+  }
 });
 
 export default News;
