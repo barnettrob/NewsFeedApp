@@ -153,7 +153,9 @@ class News extends Component {
     }
 
     let today = new Date();
-    const day = today.getDate();
+    // Get 01 - 09 for dates between those dates instead of 1 - 9.
+    // This will match 2 digit format we get back from rss feeds.
+    const day = ('0' + today.getDate()).slice(-2);
     const year = today.getFullYear();
     const todayFormatted = `${this.todayDayShort(
       today
