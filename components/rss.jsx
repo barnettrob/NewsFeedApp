@@ -135,16 +135,36 @@ class News extends Component {
     return date.replace(pattern, replacement);
   }
 
+  pubDateSort(a, b) {
+    // Use toUpperCase() to ignore character casing
+    const pubDateA = a.pubDate.toUpperCase();
+    const pubDateB = b.pubDate.toUpperCase();
+  
+    let comparison = 0;
+    if (pubDateA > pubDateB) {
+      comparison = 1;
+    } else if (pubDateA < pubDateB) {
+      comparison = -1;
+    }
+    //invert return value by multiplying by -1
+    return comparison * -1;
+  }
+
   render() {
+    // Limit each feed to 10 records.
     const feed1 = this.state.news1.slice(0, 10);
     const feed2 = this.state.news2.slice(0, 10);
     const feed3 = this.state.news3.slice(0, 10);
     const feed4 = this.state.news4.slice(0, 10);
     const feed5 = this.state.news5.slice(0, 10);
 
-    const feedsCombined = [];
+    // Combine the feeds into one array.
+    let feedsCombined = [];
     feedsCombined.push(...feed1, ...feed2, ...feed3, ...feed4, ...feed5);
 
+    // Sort by pubDate.
+    feedsCombined = feedsCombined.sort(this.pubDateSort);
+    
     // Check if feeds array is empty and show message if it is.
     if (feedsCombined === undefined || feedsCombined.length === 0) {
       return (
