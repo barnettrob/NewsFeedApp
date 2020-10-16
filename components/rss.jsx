@@ -203,6 +203,7 @@ class News extends Component {
     return newsItems.map(function (item, i) {
       let url = item.link;
       url = url.replace("https://", "");
+      url = url.replace("http://", "");
       url = url.split("/");
       const domain = url[0];
 

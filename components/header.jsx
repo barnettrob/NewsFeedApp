@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#fff",
     fontWeight: "bold",
+    marginTop: 5
   },
   navConfig: {},
 });
