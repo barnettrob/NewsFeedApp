@@ -25,13 +25,13 @@ class Settings extends Component {
               <Text style={styles.title}>Enter RSS feeds for your news:</Text>
               <SettingsForm />
               <TouchableHighlight
-                style={{ ...styles.openButton, backgroundColor: "#0b7c66", margin: 10 }}
+                style={{ ...styles.closeButton, margin: 10 }}
                 onPress={() => {
                   this.setModalVisible(!modalVisible);
                   
                 }}
               >
-                <Text style={styles.textStyle}>Close</Text>
+                <Text style={styles.closeText}>Close</Text>
               </TouchableHighlight>
             </View>
           </View>
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   modalView: {
-    marginTop: 20,
+    marginTop: 15,
     marginHorizontal: 10,
     backgroundColor: "#b3d6cf",
     alignItems: "center",
@@ -77,6 +77,17 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     elevation: 2
+  },
+  closeButton: {
+    borderColor: "#0b7c66",
+    borderWidth: 2,
+    borderRadius: 5,
+    padding: 10,
+
+  },
+  closeText: {
+    color: "#0b7c66",
+    fontWeight: "bold"
   },
   title: {
     fontSize: 18,

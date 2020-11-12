@@ -19,6 +19,7 @@ class News extends Component {
       news4: [],
       news5: [],
       savedFeeds: {},
+      feedCount: {},
     };
   }
 
@@ -54,11 +55,27 @@ class News extends Component {
         }
       }
     });
+
+    // feed count.
+    const feedCount = this.getFeedCount().then((result) => {
+      if (result !== null && Object.keys(result).length !== 0) {
+        this.setState({ feedCount: result });
+      }
+    });
   }
 
   getFeedData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem("rssFeeds");
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      // error reading value
+    }
+  };
+
+  getFeedCount = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("feedCount");
       return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (e) {
       // error reading value
@@ -151,12 +168,14 @@ class News extends Component {
   }
 
   render() {
-    // Limit each feed to 10 records.
-    const feed1 = this.state.news1.slice(0, 10);
-    const feed2 = this.state.news2.slice(0, 10);
-    const feed3 = this.state.news3.slice(0, 10);
-    const feed4 = this.state.news4.slice(0, 10);
-    const feed5 = this.state.news5.slice(0, 10);
+    const countOptions = ['10', '15', '20', '25', '30'];
+    const count = Object.keys(this.state.feedCount).length !== 0 && typeof this.state.feedCount === "number" ? this.state.feedCount : 10;
+    // Limit each feed to value stored in feedCount state.
+    const feed1 = this.state.news1.slice(0, count);
+    const feed2 = this.state.news2.slice(0, count);
+    const feed3 = this.state.news3.slice(0, count);
+    const feed4 = this.state.news4.slice(0, count);
+    const feed5 = this.state.news5.slice(0, count);
 
     // Combine the feeds into one array.
     let feedsCombined = [];

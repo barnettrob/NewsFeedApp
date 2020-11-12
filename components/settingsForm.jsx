@@ -8,13 +8,21 @@ class SettingsForm extends Component {
     this.state = {
       rssFeeds: {},
       feedsStorage: {},
+      feedCount: {},
     };
   }
 
   componentDidMount() {
+    // load Feed urls to state.
     const feeds = this.getFeedData().then((result) => {
       if (result !== null) {
         this.setState({ feedsStorage: result });
+      }
+    });
+    // load feed count to state.
+    const feedCount = this.getFeedCount().then((result) => {
+      if (result !== null) {
+        this.setState({ feedCount: result });
       }
     });
   }
@@ -32,10 +40,12 @@ class SettingsForm extends Component {
     return !!pattern.test(str);
   }
 
-  saveFeedData = async (rssFeeds) => {
+  saveFeedData = async (rssFeeds, feedCount) => {
     try {
       const jsonValue = JSON.stringify(rssFeeds);
+      const count = JSON.stringify(feedCount);
       await AsyncStorage.setItem("rssFeeds", jsonValue);
+      await AsyncStorage.setItem("feedCount", count);
       alert("Feeds Saved!")
     } catch (e) {
       alert("There was a problem saving your RSS Feeds");
@@ -45,6 +55,15 @@ class SettingsForm extends Component {
   getFeedData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem("rssFeeds");
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      // error reading value
+    }
+  };
+
+  getFeedCount = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("feedCount");
       return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (e) {
       // error reading value
@@ -88,12 +107,38 @@ class SettingsForm extends Component {
     return (
       <View>
         {rssInputArray}
+        <TextInput 
+          style={styles.input}
+          placeholder="Feed count: value must be 10, 15, 20, 25 or 30"
+          defaultValue={Object.keys(this.state.feedCount).length !== 0 ? this.state.feedCount : ''}
+          ref={input => { this.textInput = input }}
+          onEndEditing={(e) => {
+            const countOptions = ['10', '15', '20', '25', '30'];
+            // Validate url.  If not valid then clear input field.
+            if (e.nativeEvent.text != '' && !countOptions.includes(e.nativeEvent.text)) {
+              alert("Must be 10, 15, 20, 25 or 30");
+              this.textInput.clear();
+            }
+            else {
+              this.state.feedCount = e.nativeEvent.text;
+            }
+          }}
+          onChangeText={(text) => {
+            // Save count.
+            const countOptions = ['10', '15', '20', '25', '30'];
+            if (countOptions.includes(text)) {
+              this.state.feedCount = text;
+            }
+          }}
+        />
         {/* Take a look at https://react-hook-form.com/ */}
         <Button
           title="Save"
+          color="#3E8ACD"
           onPress={() => {
             const rssFeeds = this.state.rssFeeds;
-            this.saveFeedData(rssFeeds);
+            const feedCount = this.state.feedCount;
+            this.saveFeedData(rssFeeds, feedCount);
           }}
         />
       </View>
@@ -107,9 +152,9 @@ const styles = StyleSheet.create({
     padding: 10,
     borderColor: "#ccc",
     borderWidth: 1,
-    width: 350,
+    width: 330,
     marginBottom: 5,
-  },
+  }
 });
 
 export default SettingsForm;
