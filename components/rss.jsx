@@ -168,8 +168,16 @@ class News extends Component {
   }
 
   render() {
-    const countOptions = ['10', '15', '20', '25', '30'];
-    const count = Object.keys(this.state.feedCount).length !== 0 && typeof this.state.feedCount === "number" ? this.state.feedCount : 10;
+    const countOptions = [10, 15, 20, 25, 30];
+    let count = 10;
+    if (Object.keys(this.state.feedCount).length !== 0) {
+      count = Number(this.state.feedCount);
+      // make sure it's one of the available values from above, otherwise set back to 10.
+      if (!countOptions.includes(count)) {
+        count = 10;
+      }
+    }
+
     // Limit each feed to value stored in feedCount state.
     const feed1 = this.state.news1.slice(0, count);
     const feed2 = this.state.news2.slice(0, count);
