@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { StyleSheet, View, Text, Button, TextInput } from "react-native";
-import AsyncStorage from "@react-native-community/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class SettingsForm extends Component {
   constructor(props) {

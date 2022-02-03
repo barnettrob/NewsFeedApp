@@ -7,7 +7,8 @@ import {
   Text,
 } from "react-native";
 import { parse } from "fast-xml-parser";
-import AsyncStorage from "@react-native-community/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { decode } from 'html-entities';
 
 class News extends Component {
   constructor(props) {
@@ -67,6 +68,7 @@ class News extends Component {
   getFeedData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem("rssFeeds");
+
       return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (e) {
       // error reading value
@@ -76,6 +78,7 @@ class News extends Component {
   getFeedCount = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem("feedCount");
+
       return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch (e) {
       // error reading value
@@ -244,7 +247,7 @@ class News extends Component {
         >
           <View key={i} style={styles.card}>
             <Text style={styles.eyebrow}>{domain}</Text>
-            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.title}>{decode(item.title)}</Text>
             <Text style={styles.date}>{item.pubDate}</Text>
           </View>
         </TouchableOpacity>
